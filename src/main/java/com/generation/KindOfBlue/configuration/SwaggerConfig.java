@@ -24,7 +24,7 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2)
 		.select()
 		.apis(RequestHandlerSelectors
-		.basePackage("br.org.generation.blogpessoal.controller"))
+		.basePackage("com.generation.KindOfBlue.controller"))
 		.paths(PathSelectors.any())
 		.build()
 		.apiInfo(metadata())
@@ -39,7 +39,7 @@ public class SwaggerConfig {
 
 		return new ApiInfoBuilder()
 			.title("API - Blog Pessoal")
-			.description("Projeto API Spring - Blog Mundo M")
+			.description("Projeto API Spring - KindofBlue")
 			.version("1.0.0")
 			.license("Maycão License Version 2.0")
 			.licenseUrl("https://github.com/MayqOlipe")
@@ -74,4 +74,3 @@ public class SwaggerConfig {
 
 	}
 }
-
