@@ -1,76 +1,67 @@
 package com.generation.KindOfBlue.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.ResponseBuilder;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.Response;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 
 @Configuration
 public class SwaggerConfig {
+	
 	@Bean
-	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2)
-		.select()
-		.apis(RequestHandlerSelectors
-		.basePackage("com.generation.KindOfBlue.controller"))
-		.paths(PathSelectors.any())
-		.build()
-		.apiInfo(metadata())
-		.useDefaultResponseMessages(false)
-		.globalResponses(HttpMethod.GET, responseMessage())
-		.globalResponses(HttpMethod.POST, responseMessage())
-		.globalResponses(HttpMethod.PUT, responseMessage())
-		.globalResponses(HttpMethod.DELETE, responseMessage());
+	public OpenAPI springShopOpenAPI() {
+		
+		return new OpenAPI()
+				.info(new Info()
+						.title("KindOfBlue")
+						.description("Projeto Blog Pessoal - Generation Brasil")
+						.version("v0.0.1")
+	            .license(new License()
+	            		.name("generation.org.br")
+	            		.url("http://springdoc.org"))
+	    		.contact(new Contact()
+	    				.name("Mayquel de Oliveira")
+	    			  	.url("hhttps://github.com/mayqolipe")
+	                  	.email("mayq.olipe@gmail.com")))
+	    		.externalDocs(new ExternalDocumentation()
+	    				.description("Github")
+	    				.url("https://github.com/MayqOlipe/kindOfBlue"));
 	}
-
-	public static ApiInfo metadata() {
-
-		return new ApiInfoBuilder()
-			.title("API - Blog Pessoal")
-			.description("Projeto API Spring - KindofBlue")
-			.version("1.0.0")
-			.license("Maycão License Version 2.0")
-			.licenseUrl("https://github.com/MayqOlipe")
-			.contact(contact())
-			.build();
-	}
-
-	private static Contact contact() {
-
-		return new Contact("Mayquel de Oliveira", 
-			"https://github.com/MayqOlipe", 
-			"mayq.olipe@gmail.com");
-
-	}
-
-	private static List<Response> responseMessage() {
-
-		return new ArrayList<Response>() {
-
-			private static final long serialVersionUID = 1L;
-
-			{
-				add(new ResponseBuilder().code("200").description("Sucesso!").build());
-				add(new ResponseBuilder().code("201").description("Criado!").build());
-				add(new ResponseBuilder().code("400").description("Erro na requisição!").build());
-				add(new ResponseBuilder().code("401").description("Não Autorizado!").build());
-				add(new ResponseBuilder().code("403").description("Proibido!").build());
-				add(new ResponseBuilder().code("404").description("Não Encontrado!").build());
-				add(new ResponseBuilder().code("500").description("Erro!").build());
-			}
+	
+	@Bean
+	public OpenApiCustomiser customerGlobalHeaderOpenApiCustomiser() {
+		
+		return openApi -> {
+			openApi.getPaths().values()
+				.forEach(pathItem -> pathItem.readOperations()
+					.forEach(operation -> {
+							
+					ApiResponses apiResponses = operation.getResponses();
+							
+						apiResponses.addApiResponse("200", createApiResponse("Sucesso!"));
+						apiResponses.addApiResponse("201", createApiResponse("Objeto Persistido!"));
+						apiResponses.addApiResponse("204", createApiResponse("Objeto Excluído!"));
+						apiResponses.addApiResponse("400", createApiResponse("Erro na Requisição!"));
+						apiResponses.addApiResponse("401", createApiResponse("Acesso Não Autorizado!"));
+						apiResponses.addApiResponse("404", createApiResponse("Objeto Não Encontrado!"));
+						apiResponses.addApiResponse("500", createApiResponse("Erro na Aplicação!"));
+					
+					}
+				)
+			);
 		};
-
+	}
+	
+	private ApiResponse createApiResponse(String message) {
+		  
+		return new ApiResponse().description(message);
+	
 	}
 }
